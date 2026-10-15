@@ -178,7 +178,7 @@ main{min-width:0}html{-webkit-text-size-adjust:100%}
     <label class="full">Nome completo<input name="n" placeholder="Ex.: João da Silva" required></label>
     <label>Data de nascimento<input type="date" required></label>
     <label>CPF<input name="c" placeholder="000.000.000-00" required inputmode="numeric" maxlength="14" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" title="Informe o CPF completo" oninput="mkC(this)"></label>
-    <label>Telefone<input placeholder="(13) 90000-0000"></label>
+    <label>Telefone<input name="tel" placeholder="(13) 90000-0000" inputmode="tel" autocomplete="tel-national" maxlength="15" pattern="\(\d{2}\) \d{4,5}-\d{4}" title="Informe o DDD e 8 dígitos (fixo) ou 9 dígitos (celular)" oninput="mkT(this)"></label>
     <label>E-mail<input type="email" placeholder="nome@email.com"></label>
    </div>
    <div class="sec">Atendimento</div>
@@ -359,8 +359,9 @@ function bkP(j,t){const p=PL[j];p.s=t;if(t<2)delete p.ev;rPA();toast(t?'Ação r
 let pc=[{n:'Maria Aparecida Lima',c:'123.456.789-09',t:'Cirurgia'},{n:'Carlos Eduardo Pires',c:'987.654.321-00',t:'Consulta'},{n:'Ana Beatriz Rocha',c:'456.789.123-55',t:'Exame'},{n:'João Pedro Santos',c:'321.654.987-11',t:'Consulta'},{n:'Fernanda Alves Costa',c:'741.852.963-22',t:'Cirurgia'},{n:'Roberto Nascimento',c:'159.357.486-33',t:'Exame'}];
 const nz=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 function mkC(e){const d=e.value.replace(/\D/g,'').slice(0,11);e.value=d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2')}
-function rPC(){const q=$('#ps').value.trim(),qn=nz(q),qd=q.replace(/\D/g,'');const L=pc.filter(p=>!q||nz(p.n).includes(qn)||(qd&&p.c.replace(/\D/g,'').includes(qd)));$('#pcn').textContent='· '+L.length+(L.length==1?' paciente':' pacientes');$('#pb').innerHTML=L.map(p=>`<tr><td><b>${esc(p.n)}</b><div class='mu'>CPF ${p.c}</div></td><td><span class='tag pg'>${p.t}</span></td></tr>`).join('')||`<tr><td class='mu'>Nenhum paciente encontrado para "${esc(q)}".</td></tr>`}
-function addP(f){pc.unshift({n:f.n.value.trim(),c:f.c.value,t:f.t.value});$('#ps').value='';rPC();f.reset();toast('Paciente cadastrado com sucesso')}
+function mkT(e){const d=e.value.replace(/\D/g,'').slice(0,11);let v=d;if(d.length>10)v=d.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');else if(d.length>6)v=d.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');else if(d.length>2)v=d.replace(/(\d{2})(\d{0,4})/,'($1) $2');else if(d.length)v='('+d;e.value=v}
+function rPC(){const q=$('#ps').value.trim(),qn=nz(q),qd=q.replace(/\D/g,'');const L=pc.filter(p=>!q||nz(p.n).includes(qn)||(qd&&p.c.replace(/\D/g,'').includes(qd)));$('#pcn').textContent='· '+L.length+(L.length==1?' paciente':' pacientes');$('#pb').innerHTML=L.map(p=>`<tr><td><b>${esc(p.n)}</b><div class='mu'>CPF ${p.c}${p.tel?' · '+p.tel:''}</div></td><td><span class='tag pg'>${p.t}</span></td></tr>`).join('')||`<tr><td class='mu'>Nenhum paciente encontrado para "${esc(q)}".</td></tr>`}
+function addP(f){pc.unshift({n:f.n.value.trim(),c:f.c.value,tel:f.tel.value,t:f.t.value});$('#ps').value='';rPC();f.reset();toast('Paciente cadastrado com sucesso')}
 const TODAY='2026-10-15',STC=['op','pg','ok'];
 function fo(){const S=[...new Set(IND.map(i=>i.s).concat(NCS.map(r=>r.l)))].filter(x=>x!='Todos os setores').sort(),k=S.join('|')+IND.map(i=>i.n).join('|');if(fo.k==k)return;fo.k=k;const a=$('#fs').value||'Todos',b=$('#fi').value||'Todos';$('#fs').innerHTML=['Todos'].concat(S).map(x=>`<option value="${esc(x)}">${x=='Todos'?'Todos os setores':esc(x)}</option>`).join('');$('#fi').innerHTML=['Todos'].concat(IND.map(i=>i.n)).map(x=>`<option value="${esc(x)}">${x=='Todos'?'Todos os indicadores':esc(x)}</option>`).join('');$('#fs').value=a;$('#fi').value=b}
 function psec(p){if(p.v.startsWith('NC #')){const n=NCS.find(r=>'NC #'+r.id==p.v);return n?n.l:''}const i=IND.find(i=>'Indicador: '+i.n==p.v);return i?i.s:''}
