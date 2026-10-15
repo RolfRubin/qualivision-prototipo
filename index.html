@@ -72,7 +72,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;font
 .mod{position:fixed;inset:0;background:rgba(10,37,64,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.mod.on{display:flex}.mod .card{width:100%;max-width:520px;max-height:92vh;overflow:auto}
 #toast{position:fixed;bottom:calc(28px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 32px);text-align:center;line-height:1.4;background:var(--navy);color:#fff;padding:12px 22px;border-radius:12px;font-size:14px;display:none;z-index:30;border-left:4px solid var(--green)}
 @media(max-width:860px){#login{grid-template-columns:1fr}.hero{display:none}.mlogo{display:block}
-#app{grid-template-columns:1fr}aside{position:fixed;top:0;left:0;bottom:0;width:276px;max-width:84vw;height:auto;z-index:40;transform:translateX(-102%);transition:transform .25s ease;padding:calc(22px + env(safe-area-inset-top,0px)) 16px calc(22px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+#app{grid-template-columns:minmax(0,1fr)}aside{position:fixed;top:0;left:0;bottom:0;width:276px;max-width:84vw;height:auto;z-index:40;transform:translateX(-102%);transition:transform .25s ease;padding:calc(22px + env(safe-area-inset-top,0px)) 16px calc(22px + env(safe-area-inset-bottom,0px));overflow-y:auto}
 aside.open{transform:none;box-shadow:14px 0 44px rgba(0,0,0,.4)}aside .chip{margin-right:48px}.cl{display:grid;position:absolute;top:calc(20px + env(safe-area-inset-top,0px));right:12px;width:38px;height:38px}
 aside nav a{padding:14px}.mbar{display:flex}#bk{display:block}.kpi{padding:16px}.kpi b{font-size:26px}.flt{width:100%}.flt select{flex:1;min-width:0}.act{flex-direction:column-reverse}.act .btn{width:100%}
 main{padding:22px 16px}.g4{grid-template-columns:1fr 1fr}.g2,.kb,.fg{grid-template-columns:1fr}.card{overflow-x:auto}}
@@ -95,6 +95,9 @@ main{padding:22px 16px}.g4{grid-template-columns:1fr 1fr}.g2,.kb,.fg{grid-templa
 .mv{display:grid;gap:6px;justify-items:start}.it button.bkp{color:var(--mu);font-weight:500}
 @media(max-width:860px){.dfl{grid-template-columns:1fr 1fr}.dfl .btn{grid-column:1/-1}}
 @media(max-width:640px){.dr{grid-template-columns:1fr auto}.dr .bar{grid-column:1/-1;order:3}}
+main{min-width:0}html{-webkit-text-size-adjust:100%}
+@media(max-width:860px){input,select,textarea{font-size:16px}}
+@media(max-width:640px){#nc thead{display:none}#nc table,#nc tbody{display:block}#nc tbody tr{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:14px 0;border-top:1px solid var(--bd)}#nc tbody tr:first-child{border-top:0}#nc td{border:0;padding:0}#nc td:nth-child(1){grid-column:1;font-weight:700}#nc td:nth-child(5){grid-column:2;grid-row:1}#nc td:nth-child(2){grid-column:1/-1}#nc td:nth-child(3),#nc td:nth-child(4){color:var(--mu);font-size:13px}#nc td:nth-child(3){grid-column:1}#nc td:nth-child(4){grid-column:2}}
 </style></head><body>
 
 <section id="login">
