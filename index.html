@@ -92,6 +92,9 @@ main{padding:22px 16px}.g4{grid-template-columns:1fr 1fr}.g2,.kb,.fg{grid-templa
 .sm{width:auto;padding-top:8px;padding-bottom:8px}
 .btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
 .del{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--bd);background:transparent;color:#E5484D;cursor:pointer;display:inline-grid;place-items:center;padding:0}.del:hover:not(:disabled){background:rgba(229,72,77,.1);border-color:#E5484D}.del:disabled{opacity:.4;cursor:not-allowed}.del svg{width:18px;height:18px}
+.kc{cursor:pointer;transition:border-color .15s}.kc:hover,.kc:focus-visible{border-color:var(--teal);outline:none}.kv{display:block;font-size:12px;color:var(--teal);font-weight:600;margin-top:6px}
+.kr{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--bd);font-size:14px}.kr:first-child{border-top:0}.kr .tag{flex:none}.kr b{overflow-wrap:anywhere}
+.kh{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);margin:16px 0 2px}.kh:first-child{margin-top:6px}
 .dfl{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:12px;align-items:end;margin-bottom:16px;padding:16px}
 .dr{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(90px,1fr) 150px;gap:14px;align-items:center;padding:11px 0;border-top:1px solid var(--bd);font-size:13px}.dr:first-child{border-top:0}.dn{font-weight:600}.dr>:last-child{justify-self:end;text-align:right;white-space:nowrap}.dr.pl{grid-template-columns:minmax(0,1fr) auto}
 .mv{display:grid;gap:6px;justify-items:start}.it button.bkp{color:var(--mu);font-weight:500}
@@ -271,6 +274,10 @@ main{min-width:0}html{-webkit-text-size-adjust:100%}
  <div class="dl" id="ptb"></div>
  <div class="act"><button type="button" class="btn g" onclick="$('#pt').classList.remove('on')">Fechar</button></div></div></div>
 <div class="mod" id="ud"><div class="card" style="max-width:440px"><h2 style="font-size:18px">Excluir usuário?</h2><p class="mu" style="margin-top:8px"><b id="udn" style="color:var(--tx)"></b> perderá o acesso ao sistema. Esta ação não pode ser desfeita.</p><div class="act" style="margin-top:20px"><button type="button" class="btn g" onclick="$('#ud').classList.remove('on')">Cancelar</button><button type="button" class="btn" style="background:#E5484D" onclick="doDel()">Excluir</button></div></div></div>
+<div class="mod" id="kd"><div class="card" style="max-width:580px">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><span class="mu" id="kds" style="overflow-wrap:anywhere"></span><h2 id="kdt" style="font-size:19px;margin:2px 0 0"></h2></div><button class="mb" type="button" onclick="$('#kd').classList.remove('on')" aria-label="Fechar" data-i="x"></button></div>
+ <div id="kdb" style="margin-top:10px"></div>
+ <div class="act" style="margin-top:14px"><button type="button" class="btn g" onclick="$('#kd').classList.remove('on')">Fechar</button></div></div></div>
 <div id="bk" onclick="closeM()"></div><div id="toast"></div>
 
 <script>
@@ -386,6 +393,8 @@ function addP(f){pc.unshift({n:f.n.value.trim(),c:f.c.value,tel:f.tel.value,nasc
 const TODAY='2026-10-15',STC=['op','pg','ok'];
 function fo(){const S=[...new Set(IND.map(i=>i.s).concat(NCS.map(r=>r.l)))].filter(x=>x!='Todos os setores').sort(),k=S.join('|')+IND.map(i=>i.n).join('|');if(fo.k==k)return;fo.k=k;const a=$('#fs').value||'Todos',b=$('#fi').value||'Todos';$('#fs').innerHTML=['Todos'].concat(S).map(x=>`<option value="${esc(x)}">${x=='Todos'?'Todos os setores':esc(x)}</option>`).join('');$('#fi').innerHTML=['Todos'].concat(IND.map(i=>i.n)).map(x=>`<option value="${esc(x)}">${x=='Todos'?'Todos os indicadores':esc(x)}</option>`).join('');$('#fs').value=a;$('#fi').value=b}
 function psec(p){if(p.v.startsWith('NC #')){const n=NCS.find(r=>'NC #'+r.id==p.v);return n?n.l:''}const i=IND.find(i=>'Indicador: '+i.n==p.v);return i?i.s:''}
+let KD=[];
+function openK(i){$('#kdt').textContent=KD[i][0];$('#kds').textContent='Período '+($('#fd').value?$('#fd').value.split('-').reverse().join('/'):'início')+' a '+($('#ft').value?$('#ft').value.split('-').reverse().join('/'):'hoje')+($('#fs').value!='Todos'?' · '+$('#fs').value:'')+($('#fi').value!='Todos'?' · '+$('#fi').value:'');$('#kdb').innerHTML=KD[i][1];$('#kd').classList.add('on')}
 function clrD(){$('#fs').value='Todos';$('#fi').value='Todos';$('#fd').value='2026-05-01';$('#ft').value='2026-10-31';rD()}
 function rD(){fo();$('#fst').textContent=$('#fs').selectedOptions[0]?$('#fs').selectedOptions[0].text:'';$('#fit').textContent=$('#fi').selectedOptions[0]?$('#fi').selectedOptions[0].text:'';const fs=$('#fs').value||'Todos',fi=$('#fi').value||'Todos',ha=!!$('#fd').value,hb=!!$('#ft').value;let a=$('#fd').value||'0000-00-00',b=$('#ft').value||'9999-12-31';if(a>b){[a,b]=[b,a];$('#fd').value=ha?a:'';$('#ft').value=hb?b:''}
 const br=d=>d.split('-').reverse().join('/');$('#dsub').textContent='Resumo da qualidade · '+(ha?br(a):'desde o início')+' a '+(hb?br(b):'hoje');
@@ -394,7 +403,14 @@ const L=IND.filter(i=>(fs=='Todos'||i.s==fs)&&(fi=='Todos'||i.n==fi)).map(i=>({i
 const lv=x=>x.i.h[x.ks[x.ks.length-1]],mt=x=>x.i.d=='up'?lv(x)>=x.i.m:lv(x)<=x.i.m,ok=L.filter(mt).length;
 const N=NCS.filter(r=>(fs=='Todos'||r.l==fs)&&r.iso>=a&&r.iso<=b);
 const P2=PL.filter(p=>(fs=='Todos'||psec(p)==fs)&&(fi=='Todos'||p.v=='Indicador: '+fi)&&p.pi>=a&&p.pi<=b),at=P2.filter(p=>p.s<2&&p.pi<TODAY).length;
-$('#dk').innerHTML=[['Indicadores na meta',L.length?Math.round(ok/L.length*100)+'%':'—',ok+' de '+L.length+' indicadores',0],['Não conformidades abertas',fi!='Todos'?'—':N.filter(r=>r.s!='co').length,fi!='Todos'?'Não se aplica ao indicador':N.length+' registradas no período',0],['Ações em andamento',P2.filter(p=>p.s==1).length,P2.length+' ações com prazo no período',0],['Ações atrasadas',at,at?'Requer atenção':'Nenhuma atrasada',at]].map(k=>`<div class='card kpi'><span class='mu'>${k[0]}</span><b class='${k[3]?'w':''}'>${k[1]}</b><span class='t ${k[3]?'w':''}'>${k[2]}</span></div>`).join('');
+const it=(a,b,c)=>`<div class='kr'><div><b>${a}</b><div class='mu'>${b}</div></div>${c}</div>`,empty=`<p class='mu' style='padding:14px 0'>Nenhum item neste filtro.</p>`;
+const li=x=>it(esc(x.i.n),esc(x.i.s),`<span class='tag ${mt(x)?'ok':'bd'}'>${fm(lv(x),x.i.u)} / ${x.i.d=='down'?'≤':'≥'} ${fm(x.i.m,x.i.u)}</span>`);
+const pl=p=>it(esc(p.a),esc(p.v)+' · '+esc(p.r)+' · prazo '+p.p+(p.s<2&&p.pi<TODAY?' ('+Math.round((new Date(TODAY)-new Date(p.pi))/864e5)+' dias de atraso)':''),`<span class='tag ${STC[p.s]}'>${ST[p.s]}</span>`);
+KD=[['Indicadores na meta',(ok?`<h3 class='kh'>Na meta · ${ok}</h3>`+L.filter(mt).map(li).join(''):'')+(L.length>ok?`<h3 class='kh'>Fora da meta · ${L.length-ok}</h3>`+L.filter(x=>!mt(x)).map(li).join(''):'')||empty],
+['Não conformidades abertas',fi!='Todos'?`<p class='mu'>Não conformidades não são vinculadas a indicadores.</p>`:N.filter(r=>r.s!='co').map(r=>it('#'+r.id+' · '+esc(r.d),esc(r.l)+' · '+r.dt+' · Comissão: '+(r.c||'não encaminhada'),`<span class='tag ${NS[r.s][1]}'>${NS[r.s][0]}</span>`)).join('')||empty],
+['Ações em andamento',P2.filter(p=>p.s==1).map(pl).join('')||empty],
+['Ações atrasadas',P2.filter(p=>p.s<2&&p.pi<TODAY).map(pl).join('')||empty]];
+$('#dk').innerHTML=[['Indicadores na meta',L.length?Math.round(ok/L.length*100)+'%':'—',ok+' de '+L.length+' indicadores',0],['Não conformidades abertas',fi!='Todos'?'—':N.filter(r=>r.s!='co').length,fi!='Todos'?'Não se aplica ao indicador':N.length+' registradas no período',0],['Ações em andamento',P2.filter(p=>p.s==1).length,P2.length+' ações com prazo no período',0],['Ações atrasadas',at,at?'Requer atenção':'Nenhuma atrasada',at]].map((k,i)=>`<div class='card kpi kc' role='button' tabindex='0' onclick='openK(${i})' onkeydown="if(event.key=='Enter')openK(${i})"><span class='mu'>${k[0]}</span><b class='${k[3]?'w':''}'>${k[1]}</b><span class='t ${k[3]?'w':''}'>${k[2]}</span><span class='kv'>Ver lista →</span></div>`).join('');
 let c1;if(fi!='Todos'){const x=L[0];c1=`<h2>${esc(fi)}</h2>`+(x?`<p class='mu' style='margin-bottom:8px'>Objetivo estratégico: ${x.i.d=='down'?'≤':'≥'} ${fm(x.i.m,x.i.u)} · último valor: ${fm(lv(x),x.i.u)}</p>`+chart({h:x.ks.map(k=>x.i.h[k]),o:x.i.o+x.ks[0],m:x.i.m},520,190,1):`<p class='mu'>Sem valores apurados para este setor e período.</p>`)}
 else c1=`<h2>Indicadores no período</h2><div>${L.map(x=>{const g=mt(x);return `<div class='dr'><div class='dn'>${esc(x.i.n)}</div><div class='bar'><i style='width:${att({...x.i,h:[lv(x)]})}%;${g?'':'background:#E5484D'}'></i></div><div>${fm(lv(x),x.i.u)} <span class='mu'>/ ${x.i.d=='down'?'≤':'≥'} ${fm(x.i.m,x.i.u)}</span></div></div>`}).join('')||"<p class='mu'>Nenhum indicador com valores neste filtro.</p>"}</div>`;
 let c2;if(fi!='Todos')c2=`<h2>Planos de ação vinculados</h2>`+(P2.map(p=>`<div class='dr pl'><div><div class='dn'>${esc(p.a)}</div><div class='mu'>prazo ${p.p}</div></div><span class='tag ${STC[p.s]}'>${ST[p.s]}</span></div>`).join('')||"<p class='mu'>Nenhum plano vinculado neste período.</p>");
