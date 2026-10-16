@@ -91,6 +91,7 @@ main{padding:22px 16px}.g4{grid-template-columns:1fr 1fr}.g2,.kb,.fg{grid-templa
 @media(max-width:640px){.ig{grid-template-columns:1fr}}
 .sm{width:auto;padding-top:8px;padding-bottom:8px}
 .btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.del{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--bd);background:transparent;color:#E5484D;cursor:pointer;display:inline-grid;place-items:center;padding:0}.del:hover:not(:disabled){background:rgba(229,72,77,.1);border-color:#E5484D}.del:disabled{opacity:.4;cursor:not-allowed}.del svg{width:18px;height:18px}
 .dfl{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:12px;align-items:end;margin-bottom:16px;padding:16px}
 .dr{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(90px,1fr) 150px;gap:14px;align-items:center;padding:11px 0;border-top:1px solid var(--bd);font-size:13px}.dr:first-child{border-top:0}.dn{font-weight:600}.dr>:last-child{justify-self:end;text-align:right;white-space:nowrap}.dr.pl{grid-template-columns:minmax(0,1fr) auto}
 .mv{display:grid;gap:6px;justify-items:start}.it button.bkp{color:var(--mu);font-weight:500}
@@ -176,7 +177,7 @@ main{min-width:0}html{-webkit-text-size-adjust:100%}
  </section>
  <section class="scr" id="usr">
   <div class="top"><div><h1>Usuários e permissões</h1><p class="mu">Cadastre funcionários e defina o perfil de acesso de cada um</p></div><button class="btn" data-p="usrAdm" onclick="$('#um').classList.add('on')">+ Novo usuário</button></div>
-  <div class="card"><table><thead><tr><th>Nome</th><th>Setor</th><th>Perfil de acesso</th></tr></thead><tbody id="ub"></tbody></table></div>
+  <div class="card"><table><thead><tr><th>Nome</th><th>Setor</th><th>Perfil de acesso</th><th></th></tr></thead><tbody id="ub"></tbody></table></div>
   <div class="card" style="margin-top:16px"><h2>O que cada perfil pode fazer</h2><div class="lg" id="pd"></div></div>
  </section>
 
@@ -269,6 +270,7 @@ main{min-width:0}html{-webkit-text-size-adjust:100%}
  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><span class="mu">Paciente</span><h2 id="ptn" style="font-size:19px;margin:2px 0 0;overflow-wrap:anywhere"></h2></div><button class="mb" type="button" onclick="$('#pt').classList.remove('on')" aria-label="Fechar" data-i="x"></button></div>
  <div class="dl" id="ptb"></div>
  <div class="act"><button type="button" class="btn g" onclick="$('#pt').classList.remove('on')">Fechar</button></div></div></div>
+<div class="mod" id="ud"><div class="card" style="max-width:440px"><h2 style="font-size:18px">Excluir usuário?</h2><p class="mu" style="margin-top:8px"><b id="udn" style="color:var(--tx)"></b> perderá o acesso ao sistema. Esta ação não pode ser desfeita.</p><div class="act" style="margin-top:20px"><button type="button" class="btn g" onclick="$('#ud').classList.remove('on')">Cancelar</button><button type="button" class="btn" style="background:#E5484D" onclick="doDel()">Excluir</button></div></div></div>
 <div id="bk" onclick="closeM()"></div><div id="toast"></div>
 
 <script>
@@ -334,14 +336,17 @@ function rS(){const v=$('#isf').value||'Todos';$('#isf').innerHTML=['Todos'].con
 const PERM={Operacional:{s:['dash','ind','nc','pa','pac'],a:['indLanc','ncNew']},
 Supervisão:{s:['dash','ind','nc','pa','pac'],a:['indLanc','indVal','ncNew','ncTrat','paMove']},
 Gestores:{s:['dash','ind','nc','pa','pac'],a:['indLanc','indVal','indNew','indEval','ncNew','ncTrat','paNew','paMove']},
-Diretoria:{s:['dash','ind','nc','pa','pac'],a:['indEval','indNew']},
+Diretoria:{s:['dash','ind','nc','pa','pac'],a:['indLanc','indVal','indNew','indEval','ncNew','ncTrat','paNew','paMove']},
 Administrador:{s:['usr'],a:['usrAdm']}};
-const PD={Operacional:'registra não conformidades e lança valores de indicadores.',Supervisão:'valida os valores lançados pela equipe, trata não conformidades e atualiza o andamento das ações.',Gestores:'cadastra indicadores, avalia metas, trata não conformidades e cria planos de ação.',Diretoria:'acompanha o dashboard, consulta os pacientes e define e avalia os objetivos estratégicos.',Administrador:'cadastra funcionários e define o perfil de acesso de cada um.'};
+const PD={Operacional:'registra não conformidades e lança valores de indicadores.',Supervisão:'valida os valores lançados pela equipe, trata não conformidades e atualiza o andamento das ações.',Gestores:'cadastra indicadores, avalia metas, trata não conformidades e cria planos de ação.',Diretoria:'tem acesso a todas as telas e ações de Operacional, Supervisão e Gestores, além de definir e avaliar os objetivos estratégicos.',Administrador:'cadastra funcionários e define o perfil de acesso de cada um.'};
 let PF='Supervisão';const can=a=>PERM[PF].a.includes(a);
 function ap(){document.querySelectorAll('nav a').forEach(a=>a.style.display=PERM[PF].s.includes(a.dataset.s)?'':'none');document.querySelectorAll('[data-p]').forEach(e=>e.style.display=can(e.dataset.p)?'':'none');$('#mr').textContent=PF}
 function enter(){PF=$('#perf').value;$('#login').style.display='none';$('#app').style.display='grid';ap();rNC();rPA();rI();rU();go(PERM[PF].s[0])}
-let US=[{n:'Marina Souza',e:'marina.souza@visaolaser.com.br',s:'Qualidade',p:'Supervisão'},{n:'Kelly Naves',e:'kelly.naves@visaolaser.com.br',s:'Enfermagem',p:'Gestores'},{n:'Haley Dutra',e:'haley.dutra@visaolaser.com.br',s:'Administrativo',p:'Gestores'},{n:'Kelvin Simi',e:'kelvin.simi@visaolaser.com.br',s:'Biomedicina',p:'Operacional'},{n:'Dr. Marcello Barboza',e:'marcello.barboza@visaolaser.com.br',s:'Direção clínica',p:'Diretoria'}];
-function rU(){$('#ub').innerHTML=US.map((u,i)=>`<tr><td><b>${esc(u.n)}</b><div class='mu'>${esc(u.e)}</div></td><td>${esc(u.s)}</td><td><select class='sm' aria-label='Perfil de acesso' onchange='US[${i}].p=this.value;toast("Perfil atualizado")' ${can('usrAdm')?'':'disabled'}>${['Operacional','Supervisão','Gestores','Diretoria'].map(p=>`<option ${p==u.p?'selected':''}>${p}</option>`).join('')}</select></td></tr>`).join('');$('#pd').innerHTML=Object.keys(PD).map(p=>`<div style='--c:var(--teal)'><b>${p}</b>: ${PD[p]}</div>`).join('')}
+let US=[{n:'Marina Souza',e:'marina.souza@visaolaser.com.br',s:'Qualidade',p:'Supervisão'},{n:'Kelly Naves',e:'kelly.naves@visaolaser.com.br',s:'Enfermagem',p:'Gestores'},{n:'Haley Dutra',e:'haley.dutra@visaolaser.com.br',s:'Administrativo',p:'Gestores'},{n:'Kelvin Simi',e:'kelvin.simi@visaolaser.com.br',s:'Biomedicina',p:'Diretoria'},{n:'Dr. Marcello Barboza',e:'marcello.barboza@visaolaser.com.br',s:'Direção clínica',p:'Diretoria'}];
+function rU(){$('#ub').innerHTML=US.map((u,i)=>`<tr><td><b>${esc(u.n)}</b><div class='mu'>${esc(u.e)}</div></td><td>${esc(u.s)}</td><td><select class='sm' aria-label='Perfil de acesso' onchange='US[${i}].p=this.value;toast("Perfil atualizado")' ${can('usrAdm')?'':'disabled'}>${['Operacional','Supervisão','Gestores','Diretoria'].map(p=>`<option ${p==u.p?'selected':''}>${p}</option>`).join('')}</select></td><td style='text-align:right'>${can('usrAdm')?`<button class='del' type='button' ${u.n=='Marina Souza'?'disabled title="Não é possível excluir o próprio usuário"':'title="Excluir usuário"'} aria-label='Excluir usuário ${esc(u.n)}' onclick='askDel(${i})'>${ic(P.trash)}</button>`:''}</td></tr>`).join('');$('#pd').innerHTML=Object.keys(PD).map(p=>`<div style='--c:var(--teal)'><b>${p}</b>: ${PD[p]}</div>`).join('')}
+P.trash=`<path d='M3 6h18'/><path d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6'/><path d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2'/><path d='M10 11v6M14 11v6'/>`;
+let ud=-1;function askDel(i){ud=i;$('#udn').textContent=US[i].n;$('#ud').classList.add('on')}
+function doDel(){const u=US.splice(ud,1)[0];ud=-1;$('#ud').classList.remove('on');rU();toast('Usuário '+u.n+' excluído')}
 function addU(f){US.push({n:f.n.value.trim(),e:f.e.value.trim(),s:f.s.value.trim(),p:f.p.value});toast('Usuário cadastrado com perfil '+f.p.value);rU();f.reset();$('#um').classList.remove('on')}
 const NS={ab:['Aberta','op'],tr:['Em tratamento','pg'],co:['Concluída','ok']};
 let NCS=[{id:12,d:'Falta de etiqueta de identificação em amostra',l:'Ambulatório',dt:'13/10',iso:'2026-10-13',c:'NSP',s:'tr'},{id:11,d:'Lente intraocular com embalagem violada',l:'Centro cirúrgico',dt:'09/10',iso:'2026-10-09',c:'NSP',s:'ab'},{id:10,d:'Higienização incompleta de maca',l:'Enfermagem',dt:'02/10',iso:'2026-10-02',c:'CCIH',s:'co'},{id:9,d:'Atraso na esterilização de instrumental',l:'Centro cirúrgico',dt:'21/09',iso:'2026-09-21',c:'CCIH',s:'co'},{id:8,d:'Prontuário com dados incompletos',l:'Recepção',dt:'11/09',iso:'2026-09-11',c:'NSP',s:'tr'},{id:7,d:'Equipamento sem manutenção preventiva registrada',l:'Diagnóstico',dt:'28/08',iso:'2026-08-28',c:'NSP',s:'co'}],ncx=0;
