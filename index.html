@@ -112,6 +112,13 @@ main{min-width:0}html{-webkit-text-size-adjust:100%}
 .pn{color:var(--teal);cursor:pointer;font-weight:700;overflow-wrap:anywhere}.pn:hover{text-decoration:underline}
 .dl{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;margin:18px 0 6px}.dl .full{grid-column:1/-1}.dl span{display:block;font-size:12px;color:var(--mu);margin-bottom:2px}.dl b{font-weight:600;overflow-wrap:anywhere}
 @media(max-width:640px){.dl{grid-template-columns:1fr}}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
+.chp{border:1.5px solid var(--bd);background:var(--card);color:var(--tx);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.chp i{width:9px;height:9px;border-radius:50%}.chp b{background:rgba(127,140,155,.2);border-radius:999px;padding:1px 8px;font-size:12px}
+.chp:hover{border-color:var(--teal)}.chp.on{background:var(--teal);border-color:var(--teal);color:#fff}.chp.on b{background:rgba(255,255,255,.25)}
+.sh{font-size:16px;margin:24px 0 2px}.sp2{font-size:12px;margin:0 0 12px}
+.ev{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:12px;border-top:1px solid var(--bd);font-size:13px}
+.ix .mt b{font-weight:700}.pdn{font-size:12px;font-weight:600;color:#B7791F}:root[data-theme=dark] .pdn{color:#FBBF24}
 </style></head><body>
 
 <section id="login">
@@ -165,8 +172,9 @@ main{min-width:0}html{-webkit-text-size-adjust:100%}
  <section class="scr" id="ind">
   <div class="top"><div><h1>Indicadores</h1><p class="mu" id="isub"></p></div>
    <div class="flt"><select id="isf" onchange="rI()" aria-label="Setor"></select><button class="btn" data-p="indNew" onclick="$('#nm').classList.add('on')">+ Novo indicador</button></div></div>
-  <div class="g4" id="isum"></div>
-  <div class="ig" id="ig"></div>
+  <div class="chips" id="isum" role="group" aria-label="Filtrar por avaliação da meta"></div>
+  <p class="mu" style="font-size:12px;margin:0 0 4px">Resultado: compara o valor apurado com o objetivo estratégico, de forma automática. Avaliação: análise feita manualmente pelo gestor.</p>
+  <div id="ig"></div>
  </section>
 
  <section class="scr" id="nc">
@@ -366,9 +374,19 @@ function doneP(f){const p=PL[pj];p.s=2;p.ev=f.f.files[0]?f.f.files[0].name:'';rP
 const fora=i=>{const v=cur(i);return v!=null&&(i.d=='up'?v<i.m:v>i.m)};
 function newPlan(v){const o=NCS.filter(r=>r.s!='co').map(r=>'NC #'+r.id).concat(IND.filter(fora).map(i=>'Indicador: '+i.n));$('#pv').innerHTML=o.map(x=>`<option>${esc(x)}</option>`).join('');if(v)$('#pv').value=v;$('#pr').innerHTML=US.map(u=>`<option>${esc(u.n)}</option>`).join('');$('#nd').classList.remove('on');$('#im').classList.remove('on');$('#pm').classList.add('on')}
 function addPL(f){const d=f.prazo.value.split('-');PL.unshift({a:f.acao.value.trim(),r:f.resp.value,p:d[2]+'/'+d[1],pi:f.prazo.value,s:0,v:f.vinc.value});rPA();f.reset();$('#pm').classList.remove('on');go('pa');toast('Plano de ação criado')}
-function rI(){const f=$('#isf').value,pn=IND.filter(i=>i.pend).length;$('#isub').textContent='Objetivos estratégicos e avaliação das metas'+(pn?' · '+pn+(pn>1?' valores aguardando validação':' valor aguardando validação'):'');const cn=k=>IND.filter(i=>(i.e||'x')==k).length;
-$('#isum').innerHTML=[['Metas atingidas',cn('ok'),'#10B981'],['Parcialmente atingidas',cn('pt'),'#F59E0B'],['Metas não atingidas',cn('no'),'#E5484D'],['Aguardando avaliação',cn('x'),'var(--n3)']].map(a=>`<div class='card kpi'><span class='mu'>${a[0]}</span><b style='color:${a[2]}'>${a[1]}</b><span class='t'>de ${IND.length} indicadores</span></div>`).join('');
-$('#ig').innerHTML=IND.map((i,x)=>[i,x]).filter(a=>f=='Todos'||a[0].s==f).map(a=>{const i=a[0],x=a[1],e=EV[i.e||'x'];return `<div class='ix' tabindex='0' role='button' onclick='openI(${x})' onkeydown="if(event.key=='Enter')openI(${x})"><div class='ih'><span class='mu'>${esc(i.s)}</span><span class='tag ${e[1]}'>${e[0]}</span></div><h3>${esc(i.n)}</h3>${i.pend?"<span class='tag pt' style='justify-self:start'>Valor aguardando validação</span>":''}<div class='iv'><b>${fm(cur(i),i.u)}</b>${tr(i)}</div>${chart(i,240,56,0)}<div class='mt'><span class='mu'>Objetivo estratégico</span><b>${i.d=='down'?'≤':'≥'} ${fm(i.m,i.u)}</b></div><div class='bar' title='Atingimento calculado'><i style='width:${att(i)}%'></i></div></div>`}).join('')||"<p class='mu'>Nenhum indicador neste setor.</p>"}
+let IF='all';
+const ATT=i=>!i.e||i.pend||fora(i)||i.e=='pt'||i.e=='no';
+function setIF(k){IF=k;rI()}
+function icard(i,x){const e=EV[i.e||'x'],v=cur(i),res=v==null?['Sem valor','op']:fora(i)?['Fora da meta','bd']:['Dentro da meta','ok'];
+return `<div class='ix' tabindex='0' role='button' onclick='openI(${x})' onkeydown="if(event.key=='Enter')openI(${x})"><span class='mu'>${esc(i.s)}</span><h3>${esc(i.n)}</h3><div class='iv'><b>${fm(v,i.u)}</b>${tr(i)}</div><div class='mt'><span>Meta <b>${i.d=='down'?'≤':'≥'} ${fm(i.m,i.u)}</b></span><span class='tag ${res[1]}'>${res[0]}</span></div><div class='bar' title='Atingimento calculado'><i style='width:${att(i)}%'></i></div><div class='ev'><span class='mu'>Avaliação do gestor</span><span class='tag ${e[1]}'>${e[0]}</span></div>${i.pend?`<div class='pdn'>Valor aguardando validação do supervisor</div>`:''}</div>`}
+function rI(){const f=$('#isf').value,pn=IND.filter(i=>i.pend).length;$('#isub').textContent='Objetivos estratégicos e avaliação das metas'+(pn?' · '+pn+(pn>1?' valores aguardando validação':' valor aguardando validação'):'');
+const cn=k=>IND.filter(i=>(i.e||'x')==k).length;
+$('#isum').innerHTML=[['all','Todos',IND.length,''],['x','Aguardando avaliação',cn('x'),'#8AA0B8'],['ok','Atingidas',cn('ok'),'#10B981'],['pt','Parciais',cn('pt'),'#F59E0B'],['no','Não atingidas',cn('no'),'#E5484D']].map(a=>`<button type='button' class='chp ${IF==a[0]?'on':''}' onclick='setIF("${a[0]}")'>${a[3]?`<i style='background:${a[3]}'></i>`:''}${a[1]}<b>${a[2]}</b></button>`).join('');
+const L=IND.map((i,x)=>[i,x]).filter(a=>(f=='Todos'||a[0].s==f)&&(IF=='all'||(a[0].e||'x')==IF)),cd=l=>`<div class='ig'>${l.map(a=>icard(a[0],a[1])).join('')}</div>`;let h;
+if(!L.length)h=`<p class='mu' style='margin-top:16px'>Nenhum indicador neste filtro.</p>`;
+else if(IF!='all')h=cd(L);
+else{const A=L.filter(a=>ATT(a[0])),B=L.filter(a=>!ATT(a[0]));h=(A.length?`<h3 class='sh'>Precisam de atenção · ${A.length}</h3><p class='mu sp2'>Valor fora da meta, avaliação pendente ou valor aguardando validação</p>${cd(A)}`:'')+(B.length?`<h3 class='sh'>Em dia · ${B.length}</h3><p class='mu sp2'>Dentro da meta e já avaliados</p>${cd(B)}`:'')}
+$('#ig').innerHTML=h}
 function openI(x){ci=x;const i=IND[x],nx=MS[(i.o+i.h.length)%12];$('#is').textContent=i.s;$('#in2').textContent=i.n;
 $('#ib').innerHTML=`<div style='display:flex;gap:28px;flex-wrap:wrap;margin:14px 0 8px'><div><span class='mu'>Último valor${i.h.length?' ('+MS[(i.o+i.h.length-1)%12]+')':''}</span><div style='font-size:28px;font-weight:700'>${fm(cur(i),i.u)}</div></div><div><span class='mu'>Objetivo estratégico</span><div style='font-size:28px;font-weight:700;color:var(--teal)'>${i.d=='down'?'≤':'≥'} ${fm(i.m,i.u)}</div></div></div><p class='mu' style='margin-bottom:10px'>Fórmula: ${esc(i.f||'—')} · Frequência: ${esc(i.q)}</p>${chart(i,520,190,1)}`;
 let L='';if(i.pend)L=`<div class='tag pt' style='display:block;border-radius:12px;padding:10px 14px;margin-top:14px;white-space:normal'>${esc(i.pend.by)} lançou <b>${fm(i.pend.v,i.u)}</b> (${nx}) — aguardando validação do supervisor</div>`+(can('indVal')?`<div class='act' style='margin-top:10px'><button type='button' class='btn g' onclick='valI(0)'>Devolver</button><button type='button' class='btn' onclick='valI(1)'>Validar valor</button></div>`:'');
