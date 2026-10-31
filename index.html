@@ -161,8 +161,8 @@ main{min-width:0}html{-webkit-text-size-adjust:100%}
   <div class="card dfl">
    <label>Setor<div class="sw"><span id="fst"></span><select id="fs" onchange="rD()" aria-label="Setor"></select></div></label>
    <label>Indicador<div class="sw"><span id="fit"></span><select id="fi" onchange="rD()" aria-label="Indicador"></select></div></label>
-   <label>Data inicial<input type="date" id="fd" value="2026-05-01" onchange="rD()"></label>
-   <label>Data final<input type="date" id="ft" value="2026-10-31" onchange="rD()"></label>
+   <label>Data inicial<input data-br id="fd" value="01/05/2026" onchange="rD()"></label>
+   <label>Data final<input data-br id="ft" value="31/10/2026" onchange="rD()"></label>
    <button class="btn g" type="button" onclick="clrD()">Limpar</button>
   </div>
   <div class="g4" id="dk"></div>
@@ -198,7 +198,7 @@ main{min-width:0}html{-webkit-text-size-adjust:100%}
    <div class="sec">Dados pessoais</div>
    <div class="fg">
     <label class="full">Nome completo<input name="n" placeholder="Ex.: João da Silva" required></label>
-    <label>Data de nascimento<input name="nasc" type="date" required></label>
+    <label>Data de nascimento<input name="nasc" data-br required></label>
     <label>CPF<input name="c" placeholder="000.000.000-00" required inputmode="numeric" maxlength="14" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" title="Informe o CPF completo" oninput="mkC(this)"></label>
     <label>Telefone<input name="tel" placeholder="(13) 90000-0000" inputmode="tel" autocomplete="tel-national" maxlength="15" pattern="\(\d{2}\) \d{4,5}-\d{4}" title="Informe o DDD e 8 dígitos (fixo) ou 9 dígitos (celular)" oninput="mkT(this)"></label>
     <label>E-mail<input name="email" type="email" placeholder="nome@email.com"></label>
@@ -222,7 +222,7 @@ main{min-width:0}html{-webkit-text-size-adjust:100%}
  <div class="fg" style="margin-top:16px">
   <label class="full">Descrição<textarea name="d" rows="3" placeholder="O que aconteceu?" required></textarea></label>
   <label>Local<select name="l"><option>Centro cirúrgico</option><option>Ambulatório</option><option>Enfermagem</option><option>Recepção</option></select></label>
-  <label>Data do evento<input name="dt" type="date" value="2026-10-15" required></label>
+  <label>Data do evento<input name="dt" data-br value="15/10/2026" required></label>
   <label>Encaminhar à comissão<select name="c"><option>NSP</option><option>CRP</option><option>CCIH</option><option value="">Não encaminhar agora</option></select></label>
   <label>Evidências<input type="file"></label>
  </div>
@@ -238,7 +238,7 @@ main{min-width:0}html{-webkit-text-size-adjust:100%}
   <label class="full">Vinculado a<select name="vinc" id="pv" required></select></label>
   <label class="full">Ação<textarea name="acao" rows="2" placeholder="O que será feito?" required></textarea></label>
   <label>Responsável<select name="resp" id="pr" required></select></label>
-  <label>Prazo<input name="prazo" type="date" min="2026-10-15" required></label>
+  <label>Prazo<input name="prazo" data-br data-min="2026-10-15" required></label>
  </div>
  <div class="act"><button type="button" class="btn g" onclick="$('#pm').classList.remove('on')">Cancelar</button><button class="btn">Criar plano</button></div></form></div>
 <div class="mod" id="ev"><form class="card" onsubmit="event.preventDefault();doneP(this)">
@@ -435,5 +435,27 @@ let c2;if(fi!='Todos')c2=`<h2>Planos de ação vinculados</h2>`+(P2.map(p=>`<div
 else{const c=['ab','tr','co'].map(k=>N.filter(r=>r.s==k).length),t=N.length||1,q1=c[2]/t*100,q2=q1+c[1]/t*100;c2=`<h2>Não conformidades por status</h2><div class='donut' style='background:${N.length?`conic-gradient(var(--green) 0 ${q1}%,var(--teal) ${q1}% ${q2}%,var(--n3) ${q2}% 100%)`:'var(--bd)'}'><i>${N.length}</i></div><div class='lg'><div style='--c:var(--green)'>Concluídas · ${c[2]}</div><div style='--c:var(--teal)'>Em tratamento · ${c[1]}</div><div style='--c:var(--n3)'>Abertas · ${c[0]}</div></div>`}
 $('#dc1').innerHTML=c1;$('#dc2').innerHTML=c2;$('.dfl .btn').disabled=fs=='Todos'&&fi=='Todos'&&$('#fd').value=='2026-05-01'&&$('#ft').value=='2026-10-31'}
 rNC();rPA();rU();rS();rI();rPC();chkF($('#pac form'));
+
+P.cal=`<path d='M8 2v4'/><path d='M16 2v4'/><rect width='18' height='18' x='3' y='4' rx='2'/><path d='M3 10h18'/>`;
+(function(){
+ const dsc=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');
+ const toBR=v=>/^\d{4}-\d{2}-\d{2}$/.test(v)?v.split('-').reverse().join('/'):v;
+ const parse=t=>{const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t);if(!m)return null;const d=+m[1],mo=+m[2],y=+m[3],dt=new Date(y,mo-1,d);return dt.getFullYear()==y&&dt.getMonth()==mo-1&&dt.getDate()==d&&y>=1900&&y<=2100?m[3]+'-'+m[2]+'-'+m[1]:null};
+ function chk(el){const t=dsc.get.call(el),iso=parse(t);let msg='';if(t&&!iso)msg='Informe uma data válida no formato dd/mm/aaaa';else if(iso&&el.dataset.min&&iso<el.dataset.min)msg='A data não pode ser anterior a '+toBR(el.dataset.min);el.setCustomValidity(msg)}
+ document.querySelectorAll('input[data-br]').forEach(el=>{
+  Object.defineProperty(el,'value',{get(){return parse(dsc.get.call(this))||''},set(v){dsc.set.call(this,toBR(v));chk(this)},configurable:true});
+  el.placeholder='dd/mm/aaaa';el.inputMode='numeric';el.maxLength=10;el.autocomplete='off';
+  const w=document.createElement('div');w.className='pw';el.parentNode.insertBefore(w,el);w.appendChild(el);
+  const hd=document.createElement('input');hd.type='date';hd.tabIndex=-1;hd.setAttribute('aria-hidden','true');hd.style.cssText='position:absolute;right:6px;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none';
+  if(el.dataset.min)hd.min=el.dataset.min;
+  const b=document.createElement('button');b.type='button';b.className='eye';b.title='Abrir calendário';b.setAttribute('aria-label','Abrir calendário');b.innerHTML=ic(P.cal);
+  b.onclick=()=>{const v=el.value;if(v)hd.value=v;try{hd.showPicker()}catch(e){hd.focus();hd.click()}};
+  hd.onchange=()=>{if(hd.value){el.value=hd.value;el.dispatchEvent(new Event('input',{bubbles:true}))}};
+  w.append(b,hd);
+  el.addEventListener('input',()=>{const d=dsc.get.call(el).replace(/\D/g,'').slice(0,8);dsc.set.call(el,d.replace(/(\d{2})(\d)/,'$1/$2').replace(/(\d{2}\/\d{2})(\d)/,'$1/$2'));chk(el);const n=dsc.get.call(el).length;if(n==10||n==0)el.dispatchEvent(new Event('change',{bubbles:true}))});
+  if(el.form)el.form.addEventListener('reset',()=>setTimeout(()=>chk(el)));
+  chk(el);
+ });
+})();
 </script>
 </body></html>
